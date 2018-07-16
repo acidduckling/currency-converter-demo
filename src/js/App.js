@@ -18,11 +18,29 @@ class App extends React.Component {
 
   onSelectCurrency = code => {
     //console.log(code);
-    const { currencies } = this.state;
+    const { currencies, currencyAVal } = this.state;
     const currency = currencies.filter(currency => currency.code == code)[0];
     this.setState({
-      currencyB: currency
+      currencyB: currency,
+      currencyBVal: currencyAVal * currency.sellRate
     });
+  };
+
+  onChangeHandler = (input, currency) => {
+    const { currencyA, currencyB } = this.state;
+    if (currency === 'A') {
+      const newValueA = input.value;
+      this.setState({
+        currencyAVal: newValueA,
+        currencyBVal: newValueA * currencyB.sellRate
+      });
+    } else {
+      const newValueB = input.value;
+      this.setState({
+        currencyAVal: newValueB / currencyB.sellRate,
+        currencyBVal: newValueB
+      });
+    }
   };
 
   render() {
@@ -48,22 +66,23 @@ class App extends React.Component {
 
           <div className="row">
             <div className="col-sm-6 currency-from-input">
-              <h3 className={`currency-flag ${currencyA.code}`}>${currencyA.name}</h3>
+              <h3 className={`currency-flag ${currencyA.code}`}>{currencyA.name}</h3>
               {
                 //Currency A input
               }
               <div className="input-group">
-                <span className="input-group-addon">${currencyA.sign}</span>
+                <span className="input-group-addon">{currencyA.sign}</span>
                 <input
                   type="number"
-                  defaultValue={0}
+                  value={currencyAVal}
                   className="form-control"
                   aria-describedby="basic-addon2"
                   step="1"
                   pattern="\d\.\d{2}"
+                  onChange={e => this.onChangeHandler(e.target, 'A')}
                 />
                 <span className="input-group-addon" id="basic-addon2">
-                  ${currencyA.code}
+                  {currencyA.code}
                 </span>
               </div>
             </div>
@@ -73,14 +92,15 @@ class App extends React.Component {
                 //Currency B input
               }
               <div className="input-group">
-                <span className="input-group-addon">${currencyB.sign}</span>
+                <span className="input-group-addon">{currencyB.sign}</span>
                 <input
                   type="number"
-                  defaultValue={0}
+                  value={currencyBVal}
                   className="form-control"
                   aria-describedby="basic-addon3"
                   step="1"
                   pattern="\d\.\d{2}"
+                  onChange={e => this.onChangeHandler(e.target, 'B')}
                 />
                 <span className="input-group-addon" id="basic-addon3">
                   {currencyB.code}
